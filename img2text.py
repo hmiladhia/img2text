@@ -82,9 +82,10 @@ def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=F
 
 
 def img_to_ascii(source, width=None, height=None, colorful=False,
-                 chars=None, reverse=False, bg_color=None, base64=False):
+                 chars=None, reverse=False, bg_color=None, ar_coef=3, base64=False):
     img = read_img(source, base64=base64)
-    return to_ascii(img, width=width, height=height, colorful=colorful, chars=chars, reverse=reverse, bg_color=bg_color)
+    return to_ascii(img, width=width, height=height, colorful=colorful, chars=chars,
+                    reverse=reverse, bg_color=bg_color, ar_coef=ar_coef)
 
 
 
