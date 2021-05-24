@@ -18,6 +18,9 @@ setuptools.setup(
     url="https://github.com/hmiladhia/img2text",
     py_modules=['img2text'],
     install_requires=requirements,
+    entry_points={
+        'console_scripts': ['img2text=img2text:main'],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
