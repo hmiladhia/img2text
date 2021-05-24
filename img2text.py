@@ -1,5 +1,6 @@
 from io import BytesIO
 from base64 import decodebytes
+import argparse
 
 from PIL import Image
 from colorama import Fore, Back, Style
@@ -91,4 +92,31 @@ def img_to_ascii(source, width=None, height=None, colorful=False,
                     bg_color=bg_color, bright=bright, ar_coef=ar_coef)
 
 
+def main():
+    parser = argparse.ArgumentParser(description='read image as ascii text')
+    parser.add_argument('source', metavar='source', type=str, help='path to image file')
+    parser.add_argument('--width', dest='width', type=int, default=None,
+                        help='number of columns/characters to use in the generated ascii image')
+    parser.add_argument('--height', dest='height', type=int, default=None,
+                        help='number of lines to use in the generated ascii image')
+    parser.add_argument('-c', dest='colorful', default=False, action='store_true',
+                        help='get ascii image with colors')
+    parser.add_argument('--colorful', dest='colorful', default=False, action='store_true',
+                        help='get ascii image with colors')
+    parser.add_argument('--bg', dest='bg_color', default=None, help='Background color')
+    parser.add_argument('--bright', dest='bright', default=False, action='store_true', help='enable bright mode')
+    parser.add_argument('-b', dest='bright', default=False, action='store_true', help='enable bright mode')
+    parser.add_argument('-r', dest='reverse', default=False, action='store_true', help='inverse brightness')
+    parser.add_argument('--reverse', dest='reverse', default=False, action='store_true', help='inverse brightness')
+    parser.add_argument('--ar', dest='ar_coef', type=float, default=2.4,  help='set aspect ratio coefficient')
+    parser.add_argument('--aspect-ratio', dest='ar_coef', type=float, default=2.4,  help='set aspect ratio coefficient')
+    parser.add_argument('--chars', dest='chars', type=str, default=None,
+                        help='ascii chars to use for picture generation')
 
+    args = parser.parse_args()
+    print(img_to_ascii(args.source, width=args.width, height=args.height, colorful=args.colorful, chars=args.chars,
+                       bg_color=args.bg_color, bright=args.bright, ar_coef=args.ar_coef, reverse=args.reverse,))
+
+
+if __name__ == '__main__':
+    main()
