@@ -2,7 +2,7 @@ from io import BytesIO
 from base64 import decodebytes
 
 from PIL import Image
-from colorama import Fore
+from colorama import Fore, Back
 import colorama
 
 colorama.init()
@@ -62,6 +62,9 @@ def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=F
     else:
         img = img.convert('L')
 
+    if bg_color:
+        bg_color = vars(Back)[bg_color]
+
     chars = chars or r"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
     if reverse:
         chars = list(reversed(chars))
@@ -70,9 +73,10 @@ def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=F
     text_img = []
     w, h = img.size
     for i in range(h):
-        line = ""
+        line = bg_color if bg_color else ""
         for j in range(w):
             line += get_pixel(pixels[j, i], chars, colorful, bg_color)
+        line += Back.RESET if bg_color else ""
         text_img.append(line)
     return '\n'.join(text_img)
 
