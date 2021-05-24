@@ -63,7 +63,7 @@ def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=F
         img = img.convert('L')
 
     if bg_color:
-        bg_color = vars(Back)[bg_color]
+        bg_color = vars(Back)[bg_color.upper()]
 
     chars = chars or r"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
     if reverse:
