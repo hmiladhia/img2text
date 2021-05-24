@@ -2,7 +2,7 @@ from io import BytesIO
 from base64 import decodebytes
 
 from PIL import Image
-from colorama import Fore, Back
+from colorama import Fore, Back, Style
 import colorama
 
 colorama.init()
@@ -55,7 +55,8 @@ def get_pixel(pixel, chars, colorful=False, bg_color=None):
         return chars[pixel * len(chars) // 256]
 
 
-def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=False, bg_color=None, ar_coef=3):
+def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=False,
+             bg_color=None, bright=False, ar_coef=3):
     img = resize(img, width, height, ar_coef)
     if colorful:
         img = img.convert('RGB')
@@ -65,12 +66,12 @@ def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=F
     if bg_color:
         bg_color = vars(Back)[bg_color.upper()]
 
-    chars = chars or r"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
+    chars = chars or r"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "[::-1]
     if reverse:
         chars = list(reversed(chars))
 
     pixels = img.load()
-    text_img = []
+    text_img = [Style.BRIGHT] if bright else []
     w, h = img.size
     for i in range(h):
         line = bg_color if bg_color else ""
@@ -78,14 +79,16 @@ def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=F
             line += get_pixel(pixels[j, i], chars, colorful, bg_color)
         line += Back.RESET if bg_color else ""
         text_img.append(line)
+    if bright:
+        text_img.append(Style.RESET_ALL)
     return '\n'.join(text_img)
 
 
 def img_to_ascii(source, width=None, height=None, colorful=False,
-                 chars=None, reverse=False, bg_color=None, ar_coef=3, base64=False):
+                 chars=None, reverse=False, bg_color=None, bright=False, ar_coef=3, base64=False):
     img = read_img(source, base64=base64)
-    return to_ascii(img, width=width, height=height, colorful=colorful, chars=chars,
-                    reverse=reverse, bg_color=bg_color, ar_coef=ar_coef)
+    return to_ascii(img, width=width, height=height, colorful=colorful, chars=chars, reverse=reverse,
+                    bg_color=bg_color, bright=bright, ar_coef=ar_coef)
 
 
 
