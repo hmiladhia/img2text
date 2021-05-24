@@ -1,3 +1,12 @@
-.idea
-__pycache__
 *.svg
+
+# IDE
+.idea
+
+# Python
+__pycache__
+
+# Python package
+build
+dist
+img2text.egg-info
