@@ -21,6 +21,7 @@ print(ascii_img)
 ```
 
 We obtain the following:
+
 ![First Generated Image](data/gen1.png)
 
 ### Adding Color
@@ -33,6 +34,7 @@ print(ascii_img)
 ```
 
 We obtain the following:
+
 ![Second Generated Image](data/gen2.png)
 
 ### Customizing Output
@@ -46,6 +48,7 @@ print(ascii_img)
 ```
 
 We obtain the following:
+
 ![Third Generated Image](data/gen3.png)
 
 
@@ -58,6 +61,7 @@ print(ascii_img)
 ```
 
 We obtain the following:
+
 ![Fourth Generated Image](data/gen4.png)
 
 You can also change the character set by providing a custom string of characters that increase in intensity:
@@ -71,6 +75,7 @@ print(ascii_img)
 ```
 
 We obtain the following:
+
 ![Fourth Generated Image](data/gen5.png)
 
 ### Additional Options
