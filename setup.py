@@ -3,6 +3,9 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+with open("requirements.txt", "r", encoding="utf-8") as fh:
+    requirements = fh.read().split('\n')
+
 setuptools.setup(
     name="img2text",
     version="0.0.1",
@@ -14,7 +17,7 @@ setuptools.setup(
     license='MIT',
     url="https://github.com/hmiladhia/img2text",
     py_modules=['img2text'],
-    install_requires=['colorama==0.4.4'],
+    install_requires=requirements,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
