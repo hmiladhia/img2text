@@ -23,14 +23,14 @@ def read_img(source, base64=False):
     return Image.open(source)
 
 
-def resize(img, width=None, height=None):
+def resize(img, width=None, height=None, ar_coef=3):
     if width or height:
         if height is None:
             w, h = img.size
-            height = int(h/w*width/3)
+            height = int(h/w*width/ar_coef)
         elif width is None:
             w, h = img.size
-            width = int(w*3/h * height)
+            width = int(w*ar_coef/h * height)
         return img.resize((width, height))
     return img
 
@@ -55,8 +55,8 @@ def get_pixel(pixel, chars, colorful=False, bg_color=None):
         return chars[pixel * len(chars) // 256]
 
 
-def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=False, bg_color=None):
-    img = resize(img, width, height)
+def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=False, bg_color=None, ar_coef=3):
+    img = resize(img, width, height, ar_coef)
     if colorful:
         img = img.convert('RGB')
     else:
