@@ -14,9 +14,9 @@ long_description = re.sub(reg, r"![\g<alt_text>](https://raw.githubusercontent.c
 
 setuptools.setup(
     name="img2text",
-    version="0.0.2",
-    author="Dhia HMILA",
-    author_email="dhiahmila@gmail.com",
+    version="0.1.0",
+    author="Dhia Hmila",
+    author_email="dhiahmila.dev@gmail.com",
     description="A lightweight module to generate colorful ascii art from images",
     long_description=long_description,
     long_description_content_type="text/markdown",
