@@ -6,8 +6,9 @@
 
 # Python
 __pycache__
+.venv
 
 # Python package
 build
 dist
-img2text.egg-info
+*.egg-info

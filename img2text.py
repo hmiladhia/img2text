@@ -2,9 +2,9 @@ from io import BytesIO
 from base64 import decodebytes
 import argparse
 
+import colorama
 from PIL import Image
 from colorama import Fore, Back, Style
-import colorama
 
 colorama.init()
 
@@ -87,9 +87,23 @@ def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=F
 
 def img_to_ascii(source, width=None, height=None, colorful=False,
                  chars=None, reverse=False, bg_color=None, bright=False, ar_coef=2.4, base64=False):
+
     img = read_img(source, base64=base64)
-    return to_ascii(img, width=width, height=height, colorful=colorful, chars=chars, reverse=reverse,
-                    bg_color=bg_color, bright=bright, ar_coef=ar_coef)
+
+    ascii_img = to_ascii(
+        img,
+        width=width,
+        height=height,
+        colorful=colorful,
+        chars=chars,
+        reverse=reverse,
+        bg_color=bg_color,
+        bright=bright,
+        ar_coef=ar_coef,
+    )
+    img.close()
+
+    return ascii_img
 
 
 def main():
@@ -103,15 +117,34 @@ def main():
                         help='get ascii image with colors')
     parser.add_argument('--bg', dest='bg_color', default=None, help='Background color')
     parser.add_argument('-b', '--bright', dest='bright', default=False, action='store_true', help='enable bright mode')
-    parser.add_argument('-r', '--reverse', dest='reverse', default=False, action='store_true', help='inverse brightness')
+    parser.add_argument('-r', '--reverse', dest='reverse', default=False, action='store_true',
+                        help='inverse brightness')
     parser.add_argument('--ar', '--aspect-ratio', dest='ar_coef', type=float, default=2.4,
                         help='set aspect ratio coefficient')
     parser.add_argument('--chars', dest='chars', type=str, default=None,
                         help='ascii chars to use for picture generation')
+    parser.add_argument('-o', '--output', dest='output', type=str, default=None,
+                        help='output the result to a file')
 
     args = parser.parse_args()
-    print(img_to_ascii(args.source, width=args.width, height=args.height, colorful=args.colorful, chars=args.chars,
-                       bg_color=args.bg_color, bright=args.bright, ar_coef=args.ar_coef, reverse=args.reverse,))
+
+    result = img_to_ascii(
+        args.source,
+        width=args.width,
+        height=args.height,
+        colorful=args.colorful,
+        chars=args.chars,
+        bg_color=args.bg_color,
+        bright=args.bright,
+        ar_coef=args.ar_coef,
+        reverse=args.reverse,
+    )
+
+    if args.output is None:
+        print(result)
+    else:
+        with open(args.output, 'w') as f:
+            f.write(result + '\n')
 
 
 if __name__ == '__main__':
