@@ -13,6 +13,7 @@ Let's use the python logo as reference:
 ![Python Logo](data/python.png)
 
 To generate an ascii image
+
 ```python
 from img2text import img_to_ascii
 
@@ -26,7 +27,8 @@ We obtain the following:
 
 ### Adding Color
 We can customize this further by adding color (to be shown in the console):
- ```python
+
+```python
 from img2text import img_to_ascii
 
 ascii_img = img_to_ascii('data/python.png', width=80, colorful=True)
@@ -40,7 +42,7 @@ We obtain the following:
 ### Customizing Output
 We can reverse the intensity of the image by setting `reverse` to True
 
- ```python
+```python
 from img2text import img_to_ascii
 
 ascii_img = img_to_ascii('data/python.png', width=80, colorful=True, reverse=True)
@@ -53,7 +55,8 @@ We obtain the following:
 
 
 We can get a slightly brighter image by adding the `bright` option which sets the characters to bold:
- ```python
+
+```python
 from img2text import img_to_ascii
 
 ascii_img = img_to_ascii('data/python.png', width=80, colorful=True, reverse=True, bright=True)
@@ -65,7 +68,7 @@ We obtain the following:
 ![Fourth Generated Image](data/gen4.png)
 
 You can also change the character set by providing a custom string of characters that increase in intensity:
-  ```python
+```python
 from img2text import img_to_ascii
 
 chars = r" ░▒▓█"
@@ -77,6 +80,25 @@ print(ascii_img)
 We obtain the following:
 
 ![Fourth Generated Image](data/gen5.png)
+
+### Exporting ASCII image to a file
+It's also possible to export the result to a text file, so you can print its content using the `cat` command for example
+To do this all you need to do is to write the content to a file:
+
+```python
+from img2text import img_to_ascii
+
+ascii_img = img_to_ascii('data/python.png', width=80, colorful=True)
+
+with open('logo.ascii', 'w') as f:
+    f.write(ascii_img + '\n')
+```
+
+or using the CLI:
+
+```bash
+img2text -cw 80 -o logo.ascii data/python.png
+```
 
 ### Additional Options
 - Customize the width and height by providing the number of columns/lines to use
