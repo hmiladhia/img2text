@@ -4,7 +4,7 @@ A lightweight module to generate colorful ascii art from images
 
 To install img2text:
 ```python
-pip install img2text 
+pip install img2text
 ```
 
 ## How To Use
@@ -102,7 +102,7 @@ img2text -cw 80 -o logo.ascii data/python.png
 
 ### Additional Options
 - Customize the width and height by providing the number of columns/lines to use
-- Customize the aspect ratio by providing `ar_coef` coefficient. The default value is set to 2.4 
+- Customize the aspect ratio by providing `ar_coef` coefficient. The default value is set to 2.4
 but depending on the console you are using it might be interesting to try out values from [2, 3]
 - You can add a Background Color by setting `bg_color` to one of the following values:
     - BLACK
