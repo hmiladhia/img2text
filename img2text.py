@@ -1,75 +1,102 @@
-from io import BytesIO
-from base64 import decodebytes
+from __future__ import annotations
+
 import argparse
+from base64 import decodebytes
+from io import BytesIO
 
 import colorama
+from colorama import Back, Fore, Style
 from PIL import Image
-from colorama import Fore, Back, Style
 
 colorama.init()
 
-colors_dict = {"BLACK": (0, 0, 0),
-               "RED": (255, 0, 0),
-               "GREEN": (0, 255, 0),
-               "YELLOW": (255, 255, 0),
-               "BLUE": (0, 0, 255),
-               "MAGENTA": (255, 0, 255),
-               "CYAN": (0, 255, 255),
-               "WHITE": (255, 255, 255)}
+COLORS_DICT = {
+    "BLACK": (0, 0, 0),
+    "RED": (255, 0, 0),
+    "GREEN": (0, 255, 0),
+    "YELLOW": (255, 255, 0),
+    "BLUE": (0, 0, 255),
+    "MAGENTA": (255, 0, 255),
+    "CYAN": (0, 255, 255),
+    "WHITE": (255, 255, 255),
+}
+
+DEFAULT_CHARS = (
+    r" .'`^\"\,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+)
 
 
-def read_img(source, base64=False):
-    if base64:
-        source = BytesIO(decodebytes(source.encode()))
-    return Image.open(source)
+def read_img(source: str, base64: bool = False) -> Image.Image:
+    if not base64:
+        return Image.open(source)
+
+    source_io = BytesIO(decodebytes(source.encode()))
+    return Image.open(source_io)
 
 
-def resize(img, width=None, height=None, ar_coef=2.4):
-    if width or height:
-        if height is None:
-            w, h = img.size
-            height = int(h/w*width/ar_coef)
-        elif width is None:
-            w, h = img.size
-            width = int(w*ar_coef/h * height)
-        return img.resize((width, height))
+def resize(
+    img: Image.Image,
+    width: int | None = None,
+    height: int | None = None,
+    ar_coef: float = 2.4,
+) -> Image.Image:
+    if width:
+        w, h = img.size
+        height = int(h / w * width / ar_coef)
+        img = img.resize((width, height))
+    elif height:
+        w, h = img.size
+        width = int(w * ar_coef / h * height)
+        img = img.resize((width, height))
     return img
 
 
-def pick_color(r, g, b, bg_color=None):
-    m, s = "BLACK", 255**2*3
-    for color, (cr, cg, cb) in colors_dict.items():
-        score = ((cr-r)**2+(cg-g)**2+(cb-b)**2)
+def pick_color(r: int, g: int, b: int, bg_color: str | None = None) -> str:
+    m, s = "BLACK", 255**2 * 3
+    for color, (cr, cg, cb) in COLORS_DICT.items():
+        score = (cr - r) ** 2 + (cg - g) ** 2 + (cb - b) ** 2
         if color != bg_color and score < s:
             m = color
             s = score
     return m
 
 
-def get_pixel(pixel, chars, colorful=False, bg_color=None):
-    if colorful:
-        r, g, b = pixel
-        color = pick_color(r, g, b, bg_color)
-        color = vars(Fore)[color]
-        return color + chars[int((0.2989 * r + 0.5870 * g + 0.1140 * b) * len(chars) / 256)] + Fore.RESET
-    else:
+def get_pixel(
+    pixel: tuple[int, int, int],  # TODO: this is not a tuple
+    chars: str,
+    colorful: bool = False,
+    bg_color: str | None = None,
+) -> str:
+    if not colorful:
         return chars[pixel * len(chars) // 256]
 
+    r, g, b = pixel
+    color = pick_color(r, g, b, bg_color)
+    color = vars(Fore)[color]
+    grayscale = 0.2989 * r + 0.5870 * g + 0.1140 * b
+    return color + chars[int(grayscale * len(chars) / 256)] + Fore.RESET
 
-def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=False,
-             bg_color=None, bright=False, ar_coef=2.4):
+
+def to_ascii(
+    img: Image.Image,
+    width: int | None = None,
+    height: int | None = None,
+    colorful: bool = False,
+    chars: str | None = None,
+    reverse: bool = False,
+    bg_color: str | None = None,
+    bright: bool = False,
+    ar_coef: float = 2.4,
+) -> str:
     img = resize(img, width, height, ar_coef)
-    if colorful:
-        img = img.convert('RGB')
-    else:
-        img = img.convert('L')
+    img = img.convert("RGB" if colorful else "L")
 
     if bg_color:
         bg_color = vars(Back)[bg_color.upper()]
 
-    chars = chars or r"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "[::-1]
+    chars = chars or DEFAULT_CHARS
     if reverse:
-        chars = list(reversed(chars))
+        chars = chars[::-1]
 
     pixels = img.load()
     text_img = [Style.BRIGHT] if bright else []
@@ -82,49 +109,102 @@ def to_ascii(img, width=None, height=None, colorful=False, chars=None, reverse=F
         text_img.append(line)
     if bright:
         text_img.append(Style.RESET_ALL)
-    return '\n'.join(text_img)
+    return "\n".join(text_img)
 
 
-def img_to_ascii(source, width=None, height=None, colorful=False,
-                 chars=None, reverse=False, bg_color=None, bright=False, ar_coef=2.4, base64=False):
+def img_to_ascii(
+    source: str,
+    width: int | None = None,
+    height: int | None = None,
+    colorful: bool = False,
+    chars: str | None = None,
+    reverse: bool = False,
+    bg_color: str | None = None,
+    bright: bool = False,
+    ar_coef: float = 2.4,
+    base64: bool = False,
+) -> str:
 
-    img = read_img(source, base64=base64)
+    with read_img(source, base64=base64) as img:
+        return to_ascii(
+            img,
+            width=width,
+            height=height,
+            colorful=colorful,
+            chars=chars,
+            reverse=reverse,
+            bg_color=bg_color,
+            bright=bright,
+            ar_coef=ar_coef,
+        )
 
-    ascii_img = to_ascii(
-        img,
-        width=width,
-        height=height,
-        colorful=colorful,
-        chars=chars,
-        reverse=reverse,
-        bg_color=bg_color,
-        bright=bright,
-        ar_coef=ar_coef,
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="read image as ascii text")
+    parser.add_argument("source", metavar="source", type=str, help="path to image file")
+    parser.add_argument(
+        "-w",
+        "--width",
+        dest="width",
+        type=int,
+        default=None,
+        help="number of columns/characters to use in the generated ascii image",
     )
-    img.close()
-
-    return ascii_img
-
-
-def main():
-    parser = argparse.ArgumentParser(description='read image as ascii text')
-    parser.add_argument('source', metavar='source', type=str, help='path to image file')
-    parser.add_argument('-w', '--width', dest='width', type=int, default=None,
-                        help='number of columns/characters to use in the generated ascii image')
-    parser.add_argument('--height', dest='height', type=int, default=None,
-                        help='number of lines to use in the generated ascii image')
-    parser.add_argument('-c', '--colorful', dest='colorful', default=False, action='store_true',
-                        help='get ascii image with colors')
-    parser.add_argument('--bg', dest='bg_color', default=None, help='Background color')
-    parser.add_argument('-b', '--bright', dest='bright', default=False, action='store_true', help='enable bright mode')
-    parser.add_argument('-r', '--reverse', dest='reverse', default=False, action='store_true',
-                        help='inverse brightness')
-    parser.add_argument('--ar', '--aspect-ratio', dest='ar_coef', type=float, default=2.4,
-                        help='set aspect ratio coefficient')
-    parser.add_argument('--chars', dest='chars', type=str, default=None,
-                        help='ascii chars to use for picture generation')
-    parser.add_argument('-o', '--output', dest='output', type=str, default=None,
-                        help='output the result to a file')
+    parser.add_argument(
+        "--height",
+        dest="height",
+        type=int,
+        default=None,
+        help="number of lines to use in the generated ascii image",
+    )
+    parser.add_argument(
+        "-c",
+        "--colorful",
+        dest="colorful",
+        default=False,
+        action="store_true",
+        help="get ascii image with colors",
+    )
+    parser.add_argument("--bg", dest="bg_color", default=None, help="Background color")
+    parser.add_argument(
+        "-b",
+        "--bright",
+        dest="bright",
+        default=False,
+        action="store_true",
+        help="enable bright mode",
+    )
+    parser.add_argument(
+        "-r",
+        "--reverse",
+        dest="reverse",
+        default=False,
+        action="store_true",
+        help="inverse brightness",
+    )
+    parser.add_argument(
+        "--ar",
+        "--aspect-ratio",
+        dest="ar_coef",
+        type=float,
+        default=2.4,
+        help="set aspect ratio coefficient",
+    )
+    parser.add_argument(
+        "--chars",
+        dest="chars",
+        type=str,
+        default=None,
+        help="ascii chars to use for picture generation",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="output",
+        type=str,
+        default=None,
+        help="output the result to a file",
+    )
 
     args = parser.parse_args()
 
@@ -143,9 +223,9 @@ def main():
     if args.output is None:
         print(result)
     else:
-        with open(args.output, 'w') as f:
-            f.write(result + '\n')
+        with open(args.output, "w") as f:
+            f.write(result + "\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
