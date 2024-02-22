@@ -56,7 +56,7 @@ def to_ascii(
     for i in range(h):
         line = bg_color if bg_color else ""
         for j in range(w):
-            line += _get_pixel(pixels[j, i], chars, colorful, bg_color)
+            line += _get_pixel(pixels[j, i], chars, bg_color)
         line += Back.RESET if bg_color else ""
         text_img.append(line)
     if bright:
@@ -218,12 +218,11 @@ def _pick_color(r: int, g: int, b: int, bg_color: str | None = None) -> str:
 
 
 def _get_pixel(
-    pixel: tuple[int, int, int],  # TODO: this is not a tuple
+    pixel: tuple[int, int, int] | int,
     chars: str,
-    colorful: bool = False,
     bg_color: str | None = None,
 ) -> str:
-    if not colorful:
+    if not isinstance(pixel, tuple):
         return chars[pixel * len(chars) // 256]
 
     r, g, b = pixel
