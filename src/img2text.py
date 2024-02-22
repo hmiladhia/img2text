@@ -25,6 +25,9 @@ DEFAULT_CHARS = (
     r" .'`^\"\,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 )
 
+__author__ = "Dhia Hmila"
+__version__ = "0.1.1"
+
 
 def read_img(source: str, base64: bool = False) -> Image.Image:
     if not base64:
