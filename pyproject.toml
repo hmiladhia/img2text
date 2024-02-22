@@ -1,7 +1,42 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
+[project]
+name = "img2text"
+description = "A lightweight module to generate colorful ascii art from images"
+keywords = ["ascii", "art", "ascii-art", "image", "text", "color", "colour"]
+authors = [{ name = "Dhia Hmila", email = "dhiahmila.dev@gmail.com" }]
+maintainers = [{ name = "Dhia Hmila", email = "dhiahmila.dev@gmail.com" }]
+readme = { file = "README.md", content-type = "text/markdown" }
+dependencies = ["Pillow>=8.2.0", "colorama>=0.4"]
+requires-python = ">= 3.7"
+license = { file = "LICENSE" }
+dynamic = ["version"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+]
+
+[project.urls]
+Repository = "https://github.com/hmiladhia/img2text.git"
+Issues = "https://github.com/hmiladhia/img2text/issues"
+
+[project.scripts]
+img2text = "img2text:main"
+
+[tool.hatch.version]
+path = "src/img2text.py"
+
+[tool.hatch.build]
+only-packages = true
+skip-excluded-dirs = true
+only-include = ["src/img2text.py"]
+sources = ["src"]
+
+# == Formatting & Linting ==
 
 [tool.black]
 line-length = 88
@@ -16,9 +51,32 @@ profile = "black"
 [tool.ruff]
 # Rules: https://docs.astral.sh/ruff/rules
 select = [
-    'A', 'B', 'C', 'D4', 'E', 'F', 'G', 'N', 'S', 'Q', # D
-    'NPY', 'DTZ', 'RUF', 'PT', 'PL', 'FA', 'SIM', 'UP',
-    'EXE', 'ICN', 'PIE', 'PYI', 'TID', 'YTT', 'ANN', 'BLE',
+    'A',
+    'B',
+    'C',
+    'D4',
+    'E',
+    'F',
+    'G',
+    'N',
+    'S',
+    'Q',   # D
+    'NPY',
+    'DTZ',
+    'RUF',
+    'PT',
+    'PL',
+    'FA',
+    'SIM',
+    'UP',
+    'EXE',
+    'ICN',
+    'PIE',
+    'PYI',
+    'TID',
+    'YTT',
+    'ANN',
+    'BLE',
 ]
 ignore = ["A003", "ANN101", "ANN102", "ANN204", "ANN401"]
 
