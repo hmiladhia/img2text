@@ -27,28 +27,29 @@ Issues = "https://github.com/hmiladhia/img2text/issues"
 [project.scripts]
 img2text = "img2text:main"
 
+# == Hatch configuration ==
 [tool.hatch.version]
 path = "src/img2text.py"
 
 [tool.hatch.build]
 only-packages = true
 skip-excluded-dirs = true
-only-include = ["src/img2text.py"]
+only-include = ["src/img2text.py", "src/py.typed"]
 sources = ["src"]
 
 # == Formatting & Linting ==
-
-[tool.black]
-line-length = 88
-target-version = ['py38']
-
-
 [tool.isort]
 line_length = 88
 profile = "black"
 
 
 [tool.ruff]
+line-length = 88
+target-version = "py38"
+include = ["*.py", "*.pyi", "**/pyproject.toml", "*.ipynb"]
+
+
+[tool.ruff.lint]
 # Rules: https://docs.astral.sh/ruff/rules
 select = [
     'A',
@@ -60,7 +61,8 @@ select = [
     'G',
     'N',
     'S',
-    'Q',   # D
+    'Q',
+    # 'D',
     'NPY',
     'DTZ',
     'RUF',
@@ -78,15 +80,15 @@ select = [
     'ANN',
     'BLE',
 ]
-ignore = ["A003", "ANN101", "ANN102", "ANN204", "ANN401"]
-
-include = ["*.py", "*.pyi", "**/pyproject.toml", "*.ipynb"]
-line-length = 100
-target-version = "py38"
+ignore = ["ANN101", "ANN102", "ANN204"]
 
 [tool.ruff.lint.per-file-ignores]
 "img2text.py" = ["PLR0913"]
 
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.pycodestyle]
+max-line-length = 100
+
+
+[tool.ruff.lint.mccabe]
 max-complexity = 8

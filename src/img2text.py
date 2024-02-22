@@ -29,57 +29,6 @@ __author__ = "Dhia Hmila"
 __version__ = "0.1.1"
 
 
-def read_img(source: str, base64: bool = False) -> Image.Image:
-    if not base64:
-        return Image.open(source)
-
-    source_io = BytesIO(decodebytes(source.encode()))
-    return Image.open(source_io)
-
-
-def resize(
-    img: Image.Image,
-    width: int | None = None,
-    height: int | None = None,
-    ar_coef: float = 2.4,
-) -> Image.Image:
-    if width:
-        w, h = img.size
-        height = int(h / w * width / ar_coef)
-        img = img.resize((width, height))
-    elif height:
-        w, h = img.size
-        width = int(w * ar_coef / h * height)
-        img = img.resize((width, height))
-    return img
-
-
-def pick_color(r: int, g: int, b: int, bg_color: str | None = None) -> str:
-    m, s = "BLACK", 255**2 * 3
-    for color, (cr, cg, cb) in COLORS_DICT.items():
-        score = (cr - r) ** 2 + (cg - g) ** 2 + (cb - b) ** 2
-        if color != bg_color and score < s:
-            m = color
-            s = score
-    return m
-
-
-def get_pixel(
-    pixel: tuple[int, int, int],  # TODO: this is not a tuple
-    chars: str,
-    colorful: bool = False,
-    bg_color: str | None = None,
-) -> str:
-    if not colorful:
-        return chars[pixel * len(chars) // 256]
-
-    r, g, b = pixel
-    color = pick_color(r, g, b, bg_color)
-    color = vars(Fore)[color]
-    grayscale = 0.2989 * r + 0.5870 * g + 0.1140 * b
-    return color + chars[int(grayscale * len(chars) / 256)] + Fore.RESET
-
-
 def to_ascii(
     img: Image.Image,
     width: int | None = None,
@@ -91,7 +40,7 @@ def to_ascii(
     bright: bool = False,
     ar_coef: float = 2.4,
 ) -> str:
-    img = resize(img, width, height, ar_coef)
+    img = _resize(img, width, height, ar_coef)
     img = img.convert("RGB" if colorful else "L")
 
     if bg_color:
@@ -107,7 +56,7 @@ def to_ascii(
     for i in range(h):
         line = bg_color if bg_color else ""
         for j in range(w):
-            line += get_pixel(pixels[j, i], chars, colorful, bg_color)
+            line += _get_pixel(pixels[j, i], chars, colorful, bg_color)
         line += Back.RESET if bg_color else ""
         text_img.append(line)
     if bright:
@@ -127,8 +76,7 @@ def img_to_ascii(
     ar_coef: float = 2.4,
     base64: bool = False,
 ) -> str:
-
-    with read_img(source, base64=base64) as img:
+    with _read_img(source, base64=base64) as img:
         return to_ascii(
             img,
             width=width,
@@ -143,6 +91,28 @@ def img_to_ascii(
 
 
 def main() -> None:
+    args = _get_parser().parse_args()
+
+    result = img_to_ascii(
+        args.source,
+        width=args.width,
+        height=args.height,
+        colorful=args.colorful,
+        chars=args.chars,
+        bg_color=args.bg_color,
+        bright=args.bright,
+        ar_coef=args.ar_coef,
+        reverse=args.reverse,
+    )
+
+    if args.output is None:
+        print(result)
+    else:
+        with open(args.output, "w") as f:
+            f.write(result + "\n")
+
+
+def _get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="read image as ascii text")
     parser.add_argument("source", metavar="source", type=str, help="path to image file")
     parser.add_argument(
@@ -209,25 +179,58 @@ def main() -> None:
         help="output the result to a file",
     )
 
-    args = parser.parse_args()
+    return parser
 
-    result = img_to_ascii(
-        args.source,
-        width=args.width,
-        height=args.height,
-        colorful=args.colorful,
-        chars=args.chars,
-        bg_color=args.bg_color,
-        bright=args.bright,
-        ar_coef=args.ar_coef,
-        reverse=args.reverse,
-    )
 
-    if args.output is None:
-        print(result)
-    else:
-        with open(args.output, "w") as f:
-            f.write(result + "\n")
+def _read_img(source: str, base64: bool = False) -> Image.Image:
+    if not base64:
+        return Image.open(source)
+
+    source_io = BytesIO(decodebytes(source.encode()))
+    return Image.open(source_io)
+
+
+def _resize(
+    img: Image.Image,
+    width: int | None = None,
+    height: int | None = None,
+    ar_coef: float = 2.4,
+) -> Image.Image:
+    if width:
+        w, h = img.size
+        height = int(h / w * width / ar_coef)
+        img = img.resize((width, height))
+    elif height:
+        w, h = img.size
+        width = int(w * ar_coef / h * height)
+        img = img.resize((width, height))
+    return img
+
+
+def _pick_color(r: int, g: int, b: int, bg_color: str | None = None) -> str:
+    m, s = "BLACK", 255**2 * 3
+    for color, (cr, cg, cb) in COLORS_DICT.items():
+        score = (cr - r) ** 2 + (cg - g) ** 2 + (cb - b) ** 2
+        if color != bg_color and score < s:
+            m = color
+            s = score
+    return m
+
+
+def _get_pixel(
+    pixel: tuple[int, int, int],  # TODO: this is not a tuple
+    chars: str,
+    colorful: bool = False,
+    bg_color: str | None = None,
+) -> str:
+    if not colorful:
+        return chars[pixel * len(chars) // 256]
+
+    r, g, b = pixel
+    color = _pick_color(r, g, b, bg_color)
+    color = vars(Fore)[color]
+    grayscale = 0.2989 * r + 0.5870 * g + 0.1140 * b
+    return color + chars[int(grayscale * len(chars) / 256)] + Fore.RESET
 
 
 if __name__ == "__main__":
